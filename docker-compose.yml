@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    container_name: musik_client
+    volumes:
+      - ./client/src:/app/src
+    ports:
+      - 4040:8080
+    networks:
+      - main
+
+  backend:
+    env_file: ./backend/.env
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: musik_server
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend/src:/usr/src/app/src
+    networks:
+      - main
+
+networks:
+  main:
