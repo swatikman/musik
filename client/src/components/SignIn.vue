@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import Button from "./helpers/Button";
+    import Button from "./shared/Button";
     import firebase from 'firebase/app';
     import 'firebase/auth';
 
@@ -33,7 +33,7 @@
                 }
                 firebase.auth().signInWithEmailAndPassword(this.email, this.password)
                     .then(res => {
-                        console.log('submit', res)
+                        this.$router.push('/');
                     })
                     .catch(e => {
                         this.error = e.message;

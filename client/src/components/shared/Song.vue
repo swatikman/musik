@@ -6,19 +6,36 @@
         </div>
         <div class="right">
             <span>03:46</span>
-            <font-awesome-icon class="song-actions" icon="ellipsis-v"></font-awesome-icon>
+            <font-awesome-icon class="song-actions" icon="ellipsis-v" @click="showActions()"></font-awesome-icon>
         </div>
+        <SongActions v-if="actions" @hide="hideActions" @add="add" @delete="remove"/>
     </div>
 </template>
 
 <script>
+    import SongActions from "./SongActions";
     export default {
         name: "Song",
+        components: {SongActions},
         props: ['song'],
         data() {
             return {
-                singer: 'Britney Spears',
-                name: 'Oh Baby Baby'
+                actions: false,
+                id: this.song.id
+            }
+        },
+        methods: {
+            showActions() {
+                this.actions = true
+            },
+            hideActions() {
+                this.actions = false;
+            },
+            add() {
+                this.$emit('add', this.id)
+            },
+            remove() {
+                this.$emit('delete', this.id)
             }
         }
     }
@@ -30,6 +47,7 @@
         justify-content: space-between;
         padding: 10px 20px;
         border-bottom: 1px solid #c8c8c8;
+        position: relative;
 
         .left {
             .play-btn {
@@ -39,7 +57,7 @@
             }
 
             .description {
-                font-size: 20px;
+                font-size: 16px;
 
                 .singer {
                     color: #555;
@@ -48,7 +66,6 @@
                 .name {
                     color: #999;
                 }
-
             }
         }
 

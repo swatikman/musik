@@ -9,7 +9,6 @@ export function startAuthStateChangeListener() {
                     localStorage.setItem('token', token)
                 })
                 .catch(e => {
-                    console.log(e);
                 })
         } else {
             localStorage.clear();

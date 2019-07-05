@@ -12,6 +12,7 @@
 
 <style scoped lang="scss">
     .btn {
+        display: inline-flex;
         border: 1px solid rgba(#36c3fe, 0.5);
         border-radius: 5px;
         padding: 5px 20px;

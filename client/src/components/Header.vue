@@ -2,29 +2,54 @@
     <div class="header">
         <router-link to="/" class="header-title" tag="span">musik</router-link>
         <div class="right-actions">
-            <router-link to="/sign-in">
-                <Button>Sign in</Button>
-            </router-link>
-            <router-link to="/sign-up">
-                <Button>Sign up</Button>
-            </router-link>
+            <template v-if="!authorized">
+                <router-link to="/sign-in">
+                    <Button>Sign in</Button>
+                </router-link>
+                <router-link to="/sign-up">
+                    <Button>Sign up</Button>
+                </router-link>
+            </template>
+            <template v-else>
+                <router-link to="/my-music">
+                    <div class="links">My Music</div>
+                </router-link>
+                <Button @click.native="logout()">Logout</Button>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
-    import Button from "./helpers/Button";
+    import Button from "./shared/Button";
 
     export default {
         name: "Header",
-        components: {Button}
+        components: {Button},
+        data() {
+            return {
+                authorized: !!localStorage.getItem("token")
+            }
+        },
+        methods: {
+            logout() {
+                firebase.auth().signOut()
+                    .then(function() {
+                        localStorage.clear();
+                        this.authorized = false;
+                    })
+                    .catch(e => {
+                        this.authorized = false;
+                    });
+            }
+        }
     }
 </script>
 
 <style scoped lang="scss">
     .header {
         background: #ddd;
-        padding: 10px 30px;
+        padding: 15px 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -46,9 +71,17 @@
         .right-actions {
             display: flex;
             flex-direction: row;
+            align-items: center;
 
             .btn {
-                margin: 10px;
+                margin: 0px 20px;
+            }
+
+            .links {
+                color: #36c3fe;
+                &:hover {
+                    text-decoration: underline;
+                }
             }
         }
     }

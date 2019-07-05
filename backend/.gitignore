@@ -1,4 +1,5 @@
-/config/serviceAccountKey.json
+config/serviceAccountKey.json
+.env
 
 .DS_Store
 node_modules/
@@ -12,3 +13,4 @@ yarn-error.log
 *.ntvs*
 *.njsproj
 *.sln
+/src/config/serviceAccountKey.json

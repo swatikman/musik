@@ -15,7 +15,9 @@
     "@fortawesome/vue-fontawesome": "^0.1.6",
     "firebase": "^6.2.4",
     "vue": "^2.5.11",
-    "vue-router": "^3.0.7"
+    "vue-resource": "^1.5.1",
+    "vue-router": "^3.0.7",
+    "vue-select": "^3.1.0"
   },
   "browserslist": [
     "> 1%",

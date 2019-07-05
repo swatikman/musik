@@ -1,43 +1,28 @@
 <template>
-    <div class="top-songs">
-        <div class="top-songs-title">Top songs</div>
-        <div class="top-songs-list">
-            <Song v-for="song in topSongs" :song="song" ></Song>
-        </div>
+    <div class="songs">
+        <div class="songs-title">Top songs</div>
+        <Songs />
     </div>
 </template>
 
 <script>
-    import Song from "./helpers/Song";
+    import Songs from "./shared/Songs";
     export default {
         name: "TopSongs",
-        components: {Song},
+        components: {Songs},
         data() {
-            const topSongs = [];
-            for (let i = 0; i < 20; i++) {
-                topSongs.push({
-                    singer: 'Britney Spears',
-                    name: 'Oh Baby Baby'
-                })
-            }
-            return {
-                topSongs
-            }
+            return {}
         }
     }
 </script>
 
 <style scoped lang="scss">
-    .top-songs {
+    .songs {
 
-        .top-songs-title {
+        .songs-title {
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 20px;
-        }
-
-        .top-songs-list {
-            border: 1px solid #ddd;
         }
     }
 </style>

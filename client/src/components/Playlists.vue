@@ -12,7 +12,7 @@
                     <div class="playlist-username">
                         {{playlist.username}}
                     </div>
-                    <Song v-for="song in playlist.songs" :song="song"></Song>
+                    <Song v-for="song in playlist.songs" :key="song.id" :song="song"></Song>
                 </div>
             </div>
         </div>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-    import Song from "./helpers/Song";
+    import Song from "./shared/Song";
     export default {
         name: "Playlists",
         components: {Song},
@@ -32,22 +32,27 @@
                     username: 'Jacob Peralta99',
                     songs: [
                         {
+                            id: 1,
                             name: '123',
                             singer: '123',
                             length: 180
                         }, {
+                            id: 2,
                             name: '123',
                             singer: '123',
                             length: 180
                         }, {
+                            id: 3,
                             name: '123',
                             singer: '123',
                             length: 180
                         }, {
+                            id: 4,
                             name: '123',
                             singer: '123',
                             length: 180
                         }, {
+                            id: 5,
                             name: '123',
                             singer: '123',
                             length: 180
@@ -65,9 +70,6 @@
 <style scoped lang="scss">
     .playlists {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 50px 0;
 
         .playlists-list {
             border: 1px solid #ddd;
@@ -89,14 +91,16 @@
                 .playlist-info {
                     display: flex;
                     flex-direction: column;
-                    width: 900px;
+                    min-width: 400px;
 
                     .playlist-name {
-                        color: #555
+                        color: #555;
+                        margin-left: 20px;
                     }
 
                     .playlist-username {
-                        color: #999
+                        color: #999;
+                        margin-left: 20px;
                     }
                 }
             }

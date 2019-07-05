@@ -3,6 +3,7 @@ const path = require('path');
 const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const app = express();
 
@@ -16,6 +17,7 @@ admin.initializeApp({
 });
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -29,6 +31,7 @@ app.use('/api/', require('./routes/index'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/account', require('./routes/account'));
 app.use('/api/songs', require('./routes/songs'));
+app.use('/api/playlists', require('./routes/playlists'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

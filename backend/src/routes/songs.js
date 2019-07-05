@@ -1,15 +1,15 @@
 const router = require('express-promise-router')();
-const admin = require("firebase-admin");
 const songsController = require('../controllers/songs');
+const auth = require('../middleware/auth');
 
-router.get('/', songsController.get);
+router.get('/', [auth], songsController.get);
 
 router.get('/:id', songsController.getOne);
 
-router.post('/', songsController.create);
+router.post('/', [auth] , songsController.create);
 
-router.put('/', songsController.update);
+router.put('/:id', songsController.update);
 
-router.delete('/', songsController.delete);
+router.delete('/:id', [auth], songsController.delete);
 
 module.exports = router;

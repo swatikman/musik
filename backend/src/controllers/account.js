@@ -20,7 +20,6 @@ module.exports.signUp = async (request, response) => {
 };
 
 module.exports.get = async (request, response) => {
-    console.log(123);
     try {
         const link = await admin.auth().generateEmailVerificationLink("swatikman@gmail.com", actionCodeSettings);
         console.log(link);
