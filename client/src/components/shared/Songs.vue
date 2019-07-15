@@ -1,14 +1,17 @@
 <template>
     <div class="songs-list">
         <Song v-for="song in songs" :key="song.id" :song="song" @add="addToPlaylist" @delete="deleteSong" />
+        <ModalAddToPlaylist :song-id="selectedSongId"/>
     </div>
 </template>
 
 <script>
     import Song from "./Song";
+    import ModalAddToPlaylist from "./ModalAddToPlaylist";
+    import {BASE_URL} from "../../store/utils";
     export default {
         name: "Songs",
-        components: {Song},
+        components: {ModalAddToPlaylist, Song},
         created: function() {
             this.fetchData();
         },
@@ -22,12 +25,13 @@
                 })
             }
             return {
-                songs
+                songs,
+                selectedSongId: ''
             }
         },
         methods: {
             fetchData() {
-                this.$http.get('http://172.20.0.2:3000/api/songs?type=my', {
+                this.$http.get(`${BASE_URL}/api/songs?type=my`, {
                     headers: {
                         token: localStorage.getItem("token")
                     }
@@ -40,7 +44,8 @@
                     })
             },
             addToPlaylist(songId) {
-                console.log(123, songId)
+                this.selectedSongId = songId;
+                this.$modal.show('add-to-playlist');
             },
             deleteSong(songId) {
                 console.log(124, songId)

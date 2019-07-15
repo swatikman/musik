@@ -22,6 +22,8 @@
 
 <script>
     import Button from "./shared/Button";
+    import firebase from 'firebase/app';
+    import 'firebase/auth';
 
     export default {
         name: "Header",

@@ -33,7 +33,7 @@
                 }
                 firebase.auth().signInWithEmailAndPassword(this.email, this.password)
                     .then(res => {
-                        this.$router.push('/');
+                        this.$router.push('/my-music');
                     })
                     .catch(e => {
                         this.error = e.message;

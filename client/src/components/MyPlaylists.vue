@@ -22,47 +22,19 @@
 <script>
     import Song from "./shared/Song";
     export default {
-        name: "Playlists",
+        name: "MyPlaylists",
         components: {Song},
+        created() {
+            this.$store.dispatch("fetchMyPlaylists")
+        },
+        computed: {
+            playlists() {
+                console.log(this.$store.getters.myPlaylists());
+                return this.$store.getters.myPlaylists()
+            }
+        },
         data() {
-            const playlists = [];
-            for (let i = 0; i < 10; i++) {
-                playlists.push({
-                    name: 'MY FAVOURITE SONGS',
-                    username: 'Jacob Peralta99',
-                    songs: [
-                        {
-                            id: 1,
-                            name: '123',
-                            singer: '123',
-                            length: 180
-                        }, {
-                            id: 2,
-                            name: '123',
-                            singer: '123',
-                            length: 180
-                        }, {
-                            id: 3,
-                            name: '123',
-                            singer: '123',
-                            length: 180
-                        }, {
-                            id: 4,
-                            name: '123',
-                            singer: '123',
-                            length: 180
-                        }, {
-                            id: 5,
-                            name: '123',
-                            singer: '123',
-                            length: 180
-                        }
-                    ]
-                })
-            }
-            return {
-                playlists
-            }
+            return {}
         }
     }
 </script>
@@ -85,7 +57,6 @@
                     height: 200px;
                     background: darkslategray;
                     margin-right: 20px;
-
                 }
 
                 .playlist-info {

@@ -6,7 +6,7 @@
             <input type="text" class="input-song" v-model="name" placeholder="Song name">
             <div class="dropbox">
                 <input type="file" class="input-file" @change="filesChange($event.target.files)">
-                <span v-if="file === null">Drag your files here</span>
+                <span v-if="file === null">Drag song file here</span>
                 <span v-if="file">Your file: <strong>{{file.name}}</strong></span>
             </div>
             <Button @click.native="submit">Upload</Button>

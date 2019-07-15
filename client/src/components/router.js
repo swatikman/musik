@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import SignIn from './SignIn';
 import MainPage from "./MainPage";
-import Playlists from "./Playlists";
+import Playlists from "./MyPlaylists";
 import MyMusic from "./MyMusic/MyMusic";
 import NewPlaylist from "./MyMusic/NewPlaylist";
 

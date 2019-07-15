@@ -14,7 +14,7 @@
             }, 10);
         },
         destroyed: function() {
-            window.addEventListener('click',this.hide);
+            window.removeEventListener('click',this.hide);
         },
         methods: {
             hide() {

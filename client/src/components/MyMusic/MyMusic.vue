@@ -3,7 +3,7 @@
         <div class="my-playlists">
             <div class="title">Your playlists</div>
             <Button>Add new playlist</Button>
-            <Playlists/>
+            <MyPlaylists/>
         </div>
         <div class="my-songs">
             <div class="title">Uploaded songs</div>
@@ -15,14 +15,14 @@
 </template>
 
 <script>
-    import Playlists from "../Playlists";
+    import MyPlaylists from "../MyPlaylists";
     import Button from "../shared/Button";
     import UploadSongForm from "./UploadSongForm";
     import Songs from "../shared/Songs";
 
     export default {
         name: "MyMusic",
-        components: {Songs, UploadSongForm, Button, Playlists},
+        components: {Songs, UploadSongForm, Button, MyPlaylists},
         data() {
             return {
                 showUploadNewSong: false,

@@ -1,8 +1,10 @@
 <template>
     <div class="song">
         <div class="left">
-            <font-awesome-icon class="play-btn" icon="play"></font-awesome-icon>
-            <span class="description"><span class="singer">{{song.singer}}</span> - <span class="name">{{song.name}}</span></span>
+            <font-awesome-icon class="play-btn" icon="play" />
+            <span class="description">
+                <span class="singer">{{song.singer}}</span> - <span class="name">{{song.name}}</span>
+            </span>
         </div>
         <div class="right">
             <span>03:46</span>
