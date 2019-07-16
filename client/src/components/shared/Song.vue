@@ -76,10 +76,11 @@
             align-items: center;
 
             * {
-                margin-left: 20px;
+                margin-left: 10px;
             }
 
             .song-actions {
+                padding: 0 10px;
                 cursor: pointer;
                 color: #555;
             }

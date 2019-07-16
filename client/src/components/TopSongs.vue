@@ -1,7 +1,7 @@
 <template>
     <div class="songs">
         <div class="songs-title">Top songs</div>
-        <Songs />
+        <Songs :songs="songs" />
     </div>
 </template>
 
@@ -11,8 +11,19 @@
         name: "TopSongs",
         components: {Songs},
         data() {
-            return {}
-        }
+            const songs = [];
+            for (let i = 0; i < 20; i++) {
+                songs.push({
+                    id: i,
+                    singer: 'Britney Spears',
+                    name: 'Oh Baby Baby'
+                })
+            }
+            return {
+                songs,
+                selectedSongId: ''
+            }
+        },
     }
 </script>
 

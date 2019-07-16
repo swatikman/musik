@@ -29,7 +29,6 @@
         },
         computed: {
             playlists() {
-                console.log(this.$store.getters.myPlaylists());
                 return this.$store.getters.myPlaylists()
             }
         },

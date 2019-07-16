@@ -1,9 +1,10 @@
 import Vue from 'vue'
+import "@babel/polyfill";
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import App from './App.vue'
 import * as firebaseAuth from "./store/firebase-auth";
-import router from "./components/router";
+import router from "./router";
 import vSelect from 'vue-select'
 import VModal from 'vue-js-modal'
 import VueResource from 'vue-resource'

@@ -52,23 +52,18 @@
                 if (!this.isValid()) {
                     return;
                 }
-
                 const formData = new FormData();
                 formData.append("name", this.name);
                 formData.append("singer", this.singer);
                 formData.append("file", this.file, this.file.name);
 
-                this.$http.post('http://172.20.0.2:3000/api/songs', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        token: localStorage.getItem("token")
-                    }
-                }).then(res => {
-                    this.uploaded = true;
-                    this.$emit('uploaded');
-                }).catch(e => {
-                    this.error = "Error, can't upload song to server";
-                })
+                this.$store.dispatch("uploadSong", {formData})
+                    .then(res => {
+                        this.uploaded = true;
+                        this.$emit('uploaded');
+                    }).catch(e => {
+                        this.error = "Error, can't upload song to server";
+                    })
             },
             isValid() {
                 if (!this.singer || !this.name) {

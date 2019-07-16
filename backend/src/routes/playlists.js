@@ -15,6 +15,4 @@ router.delete('/:id', [auth], playlistsController.delete);
 
 router.put('/:playlistId/songs/:songId', [auth], playlistsController.addSong);
 
-router.delete('/:playlistId/songs/:songId', [auth], playlistsController.removeSong);
-
 module.exports = router;

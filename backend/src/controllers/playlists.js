@@ -1,18 +1,20 @@
+const {populate, dataFromSnapshot} = require("../utils/firestore-utils");
+
 const admin = require('firebase-admin');
 const firestore = admin.firestore;
-const documentId = firestore.FieldPath.documentId();
+const { FieldPath, FieldValue } = firestore;
+const documentId = FieldPath.documentId();
 const playlists = firestore().collection('playlists');
 const songs = firestore().collection('songs');
 
 module.exports.get = async (request, response) => {
-    let snapshot = [];
+    let query = {};
     if (request.query.type === 'my') {
-        snapshot = await getPlaylistsSnapshot({userId: request.uid});
+        query = {userId: request.uid};
     } else if (request.query.type === 'shared') {
-        snapshot = await getPlaylistsSnapshot({sharedWith: request.uid})
-    } else {
-        snapshot = await getPlaylistsSnapshot({});
+        query = {sharedWith: request.uid};
     }
+    const snapshot = await getPlaylistsSnapshot(query);
 
     const sendBack = await populate(snapshot, ['songs']);
     response.send(sendBack);
@@ -20,8 +22,10 @@ module.exports.get = async (request, response) => {
 
 module.exports.getOne = async (request, response) => {
     const playlist = await getPlaylist(request.params.id, request.uid);
+    const sendBack = await populate([playlist], ['songs']);
+
     if (playlist) {
-        response.send(playlist);
+        response.send(sendBack[0]);
     } else {
         response.status(404).send({error: 'Playlist not found'});
     }
@@ -37,13 +41,13 @@ module.exports.create = async (request, response) => {
 };
 
 module.exports.update = async (request, response) => {
-    const snapshot = getPlaylistsSnapshot({ playlistId: request.params.id});
+    const snapshot = getPlaylistsSnapshot({playlistId: request.params.id});
     snapshot.forEach(async playlist => await playlist.update({...request.body}));
     response.send({success: 'Playlist information updated'});
 };
 
 module.exports.delete = async (request, response) => {
-    const snapshot = await getPlaylistsSnapshot({ playlistId: request.params.id, userId: request.uid});
+    const snapshot = await getPlaylistsSnapshot({playlistId: request.params.id, userId: request.uid});
 
     if (snapshot) {
         snapshot.forEach(async playlist => await playlist.ref.delete());
@@ -54,36 +58,29 @@ module.exports.delete = async (request, response) => {
 };
 
 module.exports.addSong = async (request, response) => {
-    const { params: { playlistId, songId }, uid} = request;
-    const playlist = await getFirstItemSnapshot({ playlistId: playlistId, userId: uid});
+    const {params: {playlistId, songId}, uid: userId} = request;
+    const playlist = await getFirstItemSnapshot({playlistId, userId});
+    console.log(123, playlistId);
+
+    const isSongInPlaylist = playlist.data().songs.some(refs => refs.id === songId);
 
     const song = await songs.doc(songId).get();
-
     if (!song.data()) {
         return response.status(422).send({error: 'There is no such song'})
     }
-    await playlist.ref.update({
-        songs: firestore.FieldValue.arrayUnion(song.ref)
-    });
-    response.send({success: 'Song added to playlist'})
-};
 
-module.exports.removeSong = async (request, response) => {
-    const { params: { playlistId, songId }, uid} = request;
-    const playlist = await getFirstItemSnapshot({ playlistId: playlistId, userId: uid});
-
-    const song = await songs.doc(songId).get();
-
-    if (!song.data()) {
-        return response.status(422).send({error: 'There is no such song'})
+    if (!isSongInPlaylist) {
+        await playlist.ref.update({songs: FieldValue.arrayUnion(song.ref)});
+    } else {
+        await playlist.ref.update({songs: FieldValue.arrayRemove(song.ref)});
     }
-    await playlist.ref.update({
-        songs: firestore.FieldValue.arrayRemove(song.ref)
-    });
-    response.send({success: 'Song removed from playlist'})
+
+    const newPlaylist = await getFirstItemSnapshot({playlistId, userId});
+    const sendBack = await populate([newPlaylist], ['songs']);
+    response.send(sendBack[0])
 };
 
-const getFirstItemSnapshot = async (...args) => {
+const getFirstItemSnapshot = async (args) => {
     const snapshot = await getPlaylistsSnapshot(args);
     let returnItem = undefined;
     snapshot.forEach(item => {
@@ -94,7 +91,7 @@ const getFirstItemSnapshot = async (...args) => {
     return returnItem;
 };
 
-const getPlaylistsSnapshot = ({ playlistId, userId, sharedWithAll, sharedWith }) => {
+const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith}) => {
     let query = playlists;
     if (playlistId) {
         query = query.where(documentId, '==', playlistId)
@@ -112,63 +109,14 @@ const getPlaylistsSnapshot = ({ playlistId, userId, sharedWithAll, sharedWith })
 };
 
 const getPlaylist = async (playlistId, userId) => {
-    const snapshot = await getPlaylistsSnapshot({ playlistId });
+    const snapshot = await getFirstItemSnapshot({playlistId});
 
-    const playlist = dataFromSnapshot(snapshot)[0];
-    if (playlist.sharedWithAll
-            || playlist.owner === userId
-            || playlist.sharedWith.find(sharedUserId => sharedUserId === userId)) {
-        return playlist;
+    const data = snapshot.data();
+    if (data.sharedWithAll
+        || data.owner === userId
+        || data.sharedWith.find(sharedUserId => sharedUserId === userId)) {
+        return snapshot;
     }
 };
 
-const dataFromSnapshot = (snapshot) => {
-    const items = [];
-    snapshot.forEach(doc => items.push({id: doc.id, ...doc.data()}));
-    return items;
-};
 
-const populate = async (snapshot, refFields) => {
-    const refs = [];
-    snapshot.forEach(doc => {
-        const docData = doc.data();
-
-        for (let field of refFields) {
-            const value = docData[field];
-            if (!value) {
-                continue;
-            }
-            if (Array.isArray(value)) {
-                value.forEach(item => refs.push(item));
-            } else {
-                refs.push(value)
-            }
-        }
-    });
-
-    const data = dataFromSnapshot(snapshot);
-    const songsSnapshot = await firestore().getAll(...refs);
-
-    const itemsMap = new Map();
-    songsSnapshot.forEach(item => {
-        itemsMap.set(item.id, { id: item.id, ...item.data()});
-    });
-
-    data.forEach(item => {
-        for (let field of refFields) {
-            const value = item[field];
-            if (!value) {
-                continue;
-            }
-            if (Array.isArray(value)) {
-                for (let i = 0; i < value.length; i++) {
-                    value[i] = itemsMap.get(value[i].id);
-                }
-            } else {
-                item[field] = itemsMap.get(value.id);
-            }
-
-        }
-    });
-    return data
-};

@@ -1,5 +1,7 @@
 import {BASE_URL} from "../utils";
 import axios from "axios";
+import {getUserToken} from "../firebase-auth";
+import Vue from "vue";
 
 export default {
     state: {
@@ -37,30 +39,48 @@ export default {
         }]
     },
     mutations: {
-        addMyPlaylists (state, payload) {
-            state.myPlaylists.push(...payload.data);
+        SET_MY_PLAYLISTS (state, {data}) {
+            state.myPlaylists = data;
+        },
+        TOGGLE_SONG_IN_PLAYLIST(state, {data}) {
+            const index = state.myPlaylists.findIndex(playlist => data.id === playlist.id);
+            Vue.set(state.myPlaylists, index, data);
         }
     },
     actions: {
-        fetchMyPlaylists({commit}, payload) {
-            axios.get(`${BASE_URL}/api/playlists`, {
-                    headers: {
-                        token: localStorage.getItem("token")
-                    }
+        fetchPlaylist(context, {id}) {
+            return getUserToken()
+                .then(token => {
+                    return axios.get(`${BASE_URL}/api/playlists/${id}`, {headers: {token}})
                 })
-                .then(({data}) => {
-                    commit('addMyPlaylists', {data});
-                })
-                .catch(e => {
-                    console.log(3, e);
-                });
         },
-        addTrackToPlaylist({commit}, {playlistId, songId}) {
-            return axios.put(`${BASE_URL}/api/playlists/${playlistId}/songs/${songId}`, {
-                    headers: {
-                        token: localStorage.getItem("token")
-                    }
-                })
+
+        fetchMyPlaylists({commit}, payload) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const token = await getUserToken();
+                    const playlists = await axios.get(`${BASE_URL}/api/playlists`, {headers: {token}});
+                    commit('SET_MY_PLAYLISTS', {data: playlists.data});
+                    resolve(playlists)
+                } catch (e) {
+                    reject(e);
+                }
+
+            })
+        },
+
+        toggleSongInPlaylist({commit, state}, {playlistId, songId}) {
+            return new Promise(async (resolve, reject) => {
+                const token = await getUserToken();
+                try {
+                    const {data} = await axios.put(`${BASE_URL}/api/playlists/${playlistId}/songs/${songId}`,
+                        {}, {headers: {token}});
+                    commit('TOGGLE_SONG_IN_PLAYLIST', {data});
+                    resolve(data);
+                } catch (e) {
+                    reject(e);
+                }
+            });
         }
     },
     getters: {

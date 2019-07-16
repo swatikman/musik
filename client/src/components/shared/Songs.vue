@@ -7,42 +7,19 @@
 
 <script>
     import Song from "./Song";
-    import ModalAddToPlaylist from "./ModalAddToPlaylist";
+    import ModalAddToPlaylist from "./AddToPlaylist/ModalAddToPlaylist";
     import {BASE_URL} from "../../store/utils";
     export default {
         name: "Songs",
         components: {ModalAddToPlaylist, Song},
-        created: function() {
-            this.fetchData();
-        },
+        props: ["songs"],
         data() {
-            const songs = [];
-            for (let i = 0; i < 20; i++) {
-                songs.push({
-                    id: i,
-                    singer: 'Britney Spears',
-                    name: 'Oh Baby Baby'
-                })
-            }
+
             return {
-                songs,
                 selectedSongId: ''
             }
         },
         methods: {
-            fetchData() {
-                this.$http.get(`${BASE_URL}/api/songs?type=my`, {
-                    headers: {
-                        token: localStorage.getItem("token")
-                    }
-                })
-                    .then(({body}) => {
-                        this.songs = body;
-                    })
-                    .catch(e => {
-                        console.log(3, e);
-                    })
-            },
             addToPlaylist(songId) {
                 this.selectedSongId = songId;
                 this.$modal.show('add-to-playlist');

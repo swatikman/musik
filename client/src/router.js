@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import SignIn from './SignIn';
-import MainPage from "./MainPage";
-import Playlists from "./MyPlaylists";
-import MyMusic from "./MyMusic/MyMusic";
-import NewPlaylist from "./MyMusic/NewPlaylist";
+import SignIn from './components/SignIn';
+import MainPage from "./components/MainPage";
+import Playlists from "./components/MyPlaylists";
+import MyMusic from "./components/MyMusic/MyMusic";
+import NewPlaylist from "./components/MyMusic/NewPlaylist";
+import Playlist from "./components/Playlist/Playlist";
 
 Vue.use(VueRouter);
 
@@ -25,7 +26,11 @@ const vueRouter = new VueRouter({
             path: '/playlists',
             name: 'playlists',
             component: Playlists
-        },{
+        }, {
+            path: '/playlist/:id',
+            name: 'playlist',
+            component: Playlist
+        }, {
             path: '/my-music',
             name: 'my-music',
             component: MyMusic,

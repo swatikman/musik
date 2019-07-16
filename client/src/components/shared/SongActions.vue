@@ -18,7 +18,6 @@
         },
         methods: {
             hide() {
-                console.log('123');
                 this.$emit('hide')
             }
         }

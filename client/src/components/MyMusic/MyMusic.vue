@@ -9,7 +9,7 @@
             <div class="title">Uploaded songs</div>
             <Button @click.native="toggleUploadNewSong()">{{showUploadNewSong?'Cancel':'Upload new song'}}</Button>
             <UploadSongForm @uploaded="onSongUpload" :show="showUploadNewSong"/>
-            <Songs/>
+            <MySongs/>
         </div>
     </div>
 </template>
@@ -18,11 +18,11 @@
     import MyPlaylists from "../MyPlaylists";
     import Button from "../shared/Button";
     import UploadSongForm from "./UploadSongForm";
-    import Songs from "../shared/Songs";
+    import MySongs from "./MySongs";
 
     export default {
         name: "MyMusic",
-        components: {Songs, UploadSongForm, Button, MyPlaylists},
+        components: {MySongs, UploadSongForm, Button, MyPlaylists},
         data() {
             return {
                 showUploadNewSong: false,

@@ -1,20 +1,29 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
+let currentUser = null;
+
 export function startAuthStateChangeListener() {
     firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            user.getIdToken()
-                .then(token => {
-                    localStorage.setItem('token', token)
-                })
-                .catch(e => {
-                })
-        } else {
-            localStorage.clear();
-        }
+        currentUser = user;
     });
 }
+
+export const getUserToken = () => {
+    return new Promise((resolve, reject) => {
+        if (currentUser) {
+            resolve(currentUser.getIdToken());
+        }
+        firebase.auth().onAuthStateChanged((user) => {
+            currentUser = user;
+            if (currentUser) {
+                resolve(currentUser.getIdToken());
+            } else {
+                reject();
+            }
+        })
+    });
+};
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCjXl1AtoIEBSClUwUqQ9Rs-SXsBf0tfJ8",
