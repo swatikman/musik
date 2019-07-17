@@ -2,7 +2,13 @@
     <div class="header">
         <router-link to="/" class="header-title" tag="span">musik</router-link>
         <div class="right-actions">
-            <template v-if="!authorized">
+            <template v-if="user">
+                <router-link to="/my-music">
+                    <div class="links">My Music</div>
+                </router-link>
+                <Button @click.native="logout()">Logout</Button>
+            </template>
+            <template v-else="user">
                 <router-link to="/sign-in">
                     <Button>Sign in</Button>
                 </router-link>
@@ -10,39 +16,24 @@
                     <Button>Sign up</Button>
                 </router-link>
             </template>
-            <template v-else>
-                <router-link to="/my-music">
-                    <div class="links">My Music</div>
-                </router-link>
-                <Button @click.native="logout()">Logout</Button>
-            </template>
         </div>
     </div>
 </template>
 
 <script>
     import Button from "./shared/Button";
-    import firebase from 'firebase/app';
-    import 'firebase/auth';
 
     export default {
         name: "Header",
         components: {Button},
-        data() {
-            return {
-                authorized: !!localStorage.getItem("token")
+        computed: {
+            user() {
+                return this.$store.getters.getCurrentUser();
             }
         },
         methods: {
             logout() {
-                firebase.auth().signOut()
-                    .then(function() {
-                        localStorage.clear();
-                        this.authorized = false;
-                    })
-                    .catch(e => {
-                        this.authorized = false;
-                    });
+                this.$store.dispatch('logout');
             }
         }
     }

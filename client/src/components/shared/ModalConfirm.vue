@@ -8,8 +8,8 @@
                 {{ description }}
             </div>
             <div class="buttons">
-                <Button>Cancel</Button>
-                <Button>Submit</Button>
+                <Button type="link" @click.native="hide()">Cancel</Button>
+                <Button @click.native="submit()">Submit</Button>
             </div>
         </div>
     </modal>
@@ -21,7 +21,16 @@
     export default {
         name: "ModalConfirm",
         props: ['title', 'description'],
-        components: {Button}
+        components: {Button},
+        methods: {
+            submit() {
+                this.$emit('submit');
+                this.hide();
+            },
+            hide() {
+                this.$modal.hide('modal-confirm')
+            }
+        }
     }
 </script>
 

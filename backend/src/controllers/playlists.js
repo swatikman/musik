@@ -1,5 +1,5 @@
-const {populate, dataFromSnapshot} = require("../utils/firestore-utils");
-
+const uuidv4 = require('uuid/v4');
+const {populate} = require("../utils/firestore-utils");
 const admin = require('firebase-admin');
 const firestore = admin.firestore;
 const { FieldPath, FieldValue } = firestore;
@@ -32,18 +32,24 @@ module.exports.getOne = async (request, response) => {
 };
 
 module.exports.create = async (request, response) => {
+    console.log(request.body)
     await playlists.add({
         ...request.body,
-        sharedWith: [],
-        owner: request.uid
+        owner: request.uid,
+        sharedLink: '',
+        songs: []
     });
     response.send({success: 'Playlist created'})
 };
 
 module.exports.update = async (request, response) => {
-    const snapshot = getPlaylistsSnapshot({playlistId: request.params.id});
-    snapshot.forEach(async playlist => await playlist.update({...request.body}));
-    response.send({success: 'Playlist information updated'});
+    const {params: {id}, body, uid: userId} = request;
+    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
+    await playlist.ref.update({...body});
+
+    const newPlaylist = await getFirstItemSnapshot({playlistId: id, userId});
+    const sendBack = await populate([newPlaylist], ['songs']);
+    response.send(sendBack[0]);
 };
 
 module.exports.delete = async (request, response) => {
@@ -57,10 +63,29 @@ module.exports.delete = async (request, response) => {
     }
 };
 
-module.exports.addSong = async (request, response) => {
+module.exports.createSharedLink = async (request, response) => {
+    const sharedLink = uuidv4();
+
+    await playlists.doc(request.params.id).update({
+        sharedLink
+    });
+
+    response.send({sharedLink})
+};
+
+module.exports.getSharedLink = async (request, response) => {
+    const playlist = await playlists.doc(request.params.id).get();
+    const sharedLink = playlist.data().sharedLink;
+    if (sharedLink) {
+        response.send({sharedLink})
+    } else {
+        response.status(404).send({error: 'Link not found'})
+    }
+};
+
+module.exports.toggleSong = async (request, response) => {
     const {params: {playlistId, songId}, uid: userId} = request;
     const playlist = await getFirstItemSnapshot({playlistId, userId});
-    console.log(123, playlistId);
 
     const isSongInPlaylist = playlist.data().songs.some(refs => refs.id === songId);
 

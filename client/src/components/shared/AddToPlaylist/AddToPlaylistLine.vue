@@ -1,6 +1,6 @@
 <template>
     <div class="playlist">
-        <router-link :to="link">
+        <router-link :to="`/playlist/${this.playlist.id}`">
             <div>{{playlist.name}}</div>
         </router-link>
         <font-awesome-icon v-if="isAdded" class="remove-btn" icon="coffee" @click="$emit('toggle-song', playlist.id)"/>
@@ -15,9 +15,6 @@
         computed: {
             isAdded() {
                 return this.playlist.songs.some(song => song.id === this.songId)
-            },
-            link() {
-                return `/playlist/${this.playlist.id}`
             }
         }
     }
@@ -34,6 +31,10 @@
         .plus-btn, .remove-btn {
             color: green;
             cursor: pointer;
+        }
+
+        a {
+            color: #36c3fe;
         }
     }
 </style>

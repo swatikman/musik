@@ -1,8 +1,8 @@
 <template>
     <div class="login-container">
         <div class="login-title">Sign in</div>
-        <form class="login-form">
-            <div v-if="error !== null" class="error">{{error}}</div>
+        <form class="login-form" :class="loading">
+            <div v-if="error" class="error">{{error}}</div>
             <input type="text" v-model="email" placeholder="Email"/>
             <input type="password" v-model="password" placeholder="Password"/>
             <Button @click.native="submit()">Submit</Button>
@@ -13,17 +13,36 @@
 
 <script>
     import Button from "./shared/Button";
-    import firebase from 'firebase/app';
-    import 'firebase/auth';
 
     export default {
         name: 'sign-in',
         components: {Button},
+        computed: {
+            user() {
+                return this.$store.getters.getCurrentUser();
+            },
+            loading() {
+                return this.$store.getters.isLoading() ? 'disabled' : '';
+            },
+            error() {
+                if (this.errorValidation) {
+                    return this.errorValidation;
+                }
+                return this.$store.getters.error();
+            }
+        },
+        watch: {
+            user(value) {
+                if (value !== null && value !== undefined) {
+                    this.$router.push('/my-music')
+                }
+            }
+        },
         data() {
             return {
                 email: '',
                 password: '',
-                error: null
+                errorValidation: null
             };
         },
         methods: {
@@ -31,20 +50,15 @@
                 if (!this.isValid()) {
                     return;
                 }
-                firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-                    .then(res => {
-                        this.$router.push('/my-music');
-                    })
-                    .catch(e => {
-                        this.error = e.message;
-                    })
+                const {email, password} = this;
+                this.$store.dispatch("signIn", {email, password});
             },
             isValid() {
                 if (!this.email || !this.password) {
-                    this.error = 'Email and password should not be empty';
+                    this.errorValidation = 'Email and password should not be empty';
                     return false;
                 }
-                this.error = null;
+                this.errorValidation= null;
                 return true;
             }
         }

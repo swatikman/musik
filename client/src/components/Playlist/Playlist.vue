@@ -1,19 +1,26 @@
 <template>
-    <div class="playlist-container">
+    <div class="playlist-container" :class="loading">
         <div class="playlist-header">
-            <div class="title">{{playlist.name}}</div>
+            <div class="title-container">
+                <div class="title">{{playlist.name}}</div>
+                <font-awesome-icon
+                    v-if="playlist.sharedWithAll === 'false'"
+                    class="private-btn"
+                    icon="lock"
+                    title="Private"/>
+            </div>
             <div class="actions">
-                <Button @click.native="share">Share</Button>
-                <Button @click.native="edit">Edit</Button>
-                <Button @click.native="deletePlaylist" type="danger">Delete</Button>
+                <Button @click.native="onShareClick">Share</Button>
+                <Button @click.native="onEditClick">Edit</Button>
+                <Button @click.native="onDeleteClick" type="danger">Delete</Button>
             </div>
         </div>
         <div class="playlist-content">
             <Songs :songs="playlist.songs"></Songs>
         </div>
-        <ModalSharePlaylist />
-        <ModalEditPlaylist />
-        <ModalConfirm title="Delete playlist" description="Are you sure you want to delete this playlist?" />
+        <ModalSharePlaylist :playlistId="playlist.id" :sharedLink="playlist.sharedLink"/>
+        <ModalEditPlaylist :playlist="playlist" @submit="editPlaylist" />
+        <ModalConfirm title="Delete playlist" description="Are you sure you want to delete this playlist?" @submit="deletePlaylist" />
     </div>
 </template>
 
@@ -30,28 +37,36 @@
         created() {
             this.fetch();
         },
-        data() {
-            return {
-                playlist: {}
+        computed: {
+            playlist() {
+                return this.$store.getters.getPlaylist();
+            },
+            loading() {
+                return this.$store.getters.isLoading() ? 'disabled' : '';
             }
+        },
+        destroyed() {
+            this.$store.dispatch("clearPlaylist")
         },
         methods: {
             async fetch() {
-                try {
-                    const {data} = await this.$store.dispatch("fetchPlaylist", {id: this.$route.params.id});
-                    this.playlist = data;
-                } catch (e) {
-                    console.log(e)
-                }
+                this.$store.dispatch("fetchPlaylist", {id: this.$route.params.id});
             },
-            share() {
+            onShareClick() {
                 this.$modal.show('modal-share-playlist');
             },
-            edit() {
+            onEditClick() {
                 this.$modal.show('modal-edit-playlist');
             },
-            deletePlaylist() {
+            onDeleteClick() {
                 this.$modal.show('modal-confirm')
+            },
+            deletePlaylist() {
+                alert('NOT IMPLEMENTED YET :(')
+            },
+            editPlaylist(data) {
+                this.$modal.hide('modal-edit-playlist');
+                this.$store.dispatch("editPlaylist", {id: this.playlist.id, data})
             }
         }
     }
@@ -69,9 +84,25 @@
             flex-direction: column;
             margin: 50px 0;
 
-            .title {
-                font-size: 36px;
+            .title-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+                margin-bottom: 20px;
+
+                .title {
+                    font-size: 36px;
+                    margin-right: 20px;
+                }
+
+                .private-btn {
+                    width: 30px;
+                    height: 30px;
+                    color: indianred;
+                }
             }
+
 
             .actions {
                 display: flex;

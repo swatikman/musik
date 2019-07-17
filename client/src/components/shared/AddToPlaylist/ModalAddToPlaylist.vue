@@ -21,7 +21,14 @@
         components: {AddToPlaylistLine},
         props: ['songId'],
         created() {
-            this.fetch();
+            if (this.user) {
+                this.fetch();
+            }
+        },
+        computed: {
+            user() {
+                return this.$store.getters.getCurrentUser()
+            }
         },
         data() {
             return {

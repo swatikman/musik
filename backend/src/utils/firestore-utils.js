@@ -20,6 +20,9 @@ module.exports.populate = async (snapshot, refFields = []) => {
     });
 
     const data = module.exports.dataFromSnapshot(snapshot);
+    if (!refs.length) {
+        return data;
+    }
     const itemsSnapshot = await firestore().getAll(...refs);
 
     const itemsMap = new Map();

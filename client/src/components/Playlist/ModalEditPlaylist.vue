@@ -4,7 +4,7 @@
             <div class="title">Edit playlist</div>
             <div class="edit-title">
                 <div>Change title:</div>
-                <input type="text" v-model="title" />
+                <input type="text" v-model="title"/>
             </div>
             <div class="edit-shared-with-all">
                 <span>Visibility:</span>
@@ -15,7 +15,7 @@
             </div>
             <div class="bottom-buttons">
                 <Button @click.native="cancel">Cancel</Button>
-                <Button>Submit</Button>
+                <Button @click.native="submit">Submit</Button>
             </div>
         </div>
     </modal>
@@ -23,9 +23,17 @@
 
 <script>
     import Button from "../shared/Button";
+
     export default {
         name: "ModalEditPlaylist",
         components: {Button},
+        props: ['playlist'],
+        watch: {
+            playlist(value) {
+                this.title = value.name;
+                this.sharedWithAll = value.sharedWithAll;
+            }
+        },
         data() {
             return {
                 title: '',
@@ -35,6 +43,9 @@
         methods: {
             cancel() {
                 this.$modal.hide('modal-edit-playlist')
+            },
+            submit() {
+                this.$emit('submit', {name: this.title, sharedWithAll: this.sharedWithAll});
             }
         }
     }
@@ -67,6 +78,7 @@
 
         .edit-shared-with-all {
             margin-bottom: 10px;
+
             span {
                 font-size: 20px;
             }

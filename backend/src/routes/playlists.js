@@ -13,6 +13,10 @@ router.put('/:id', [auth], playlistsController.update);
 
 router.delete('/:id', [auth], playlistsController.delete);
 
-router.put('/:playlistId/songs/:songId', [auth], playlistsController.addSong);
+router.post('/:id/sharedLink', [auth], playlistsController.createSharedLink);
+
+router.get('/:id/sharedLink', [auth], playlistsController.getSharedLink);
+
+router.put('/:playlistId/songs/:songId', [auth], playlistsController.toggleSong);
 
 module.exports = router;

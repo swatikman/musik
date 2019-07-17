@@ -16,6 +16,9 @@
             btnClass() {
                 let btnClass = 'btn-normal';
                 switch (this.type) {
+                    case 'link':
+                        btnClass = 'btn-link';
+                        break;
                     case 'danger':
                         btnClass = 'btn-danger';
                         break;
@@ -39,9 +42,19 @@
         &.btn-normal {
             border: 1px solid rgba(#36c3fe, 0.5);
             background: #36c3fe;
+
             &:hover {
                 background: white;
                 color: #36c3fe;
+            }
+        }
+
+        &.btn-link {
+            color: #36c3fe;
+
+            &:hover {
+                background: #36c3fe;
+                color: white;
             }
         }
 

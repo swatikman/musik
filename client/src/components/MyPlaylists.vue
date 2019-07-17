@@ -6,12 +6,8 @@
 
                 </div>
                 <div class="playlist-info">
-                    <div class="playlist-name">
-                        {{playlist.name}}
-                    </div>
-                    <div class="playlist-username">
-                        {{playlist.username}}
-                    </div>
+                    <router-link class="playlist-name" :to="'/playlist/' + playlist.id">{{playlist.name}}</router-link>
+                    <div class="playlist-username">{{playlist.username}}</div>
                     <Song v-for="song in playlist.songs" :key="song.id" :song="song"></Song>
                 </div>
             </div>
@@ -21,6 +17,7 @@
 
 <script>
     import Song from "./shared/Song";
+
     export default {
         name: "MyPlaylists",
         components: {Song},
@@ -31,9 +28,6 @@
             playlists() {
                 return this.$store.getters.myPlaylists()
             }
-        },
-        data() {
-            return {}
         }
     }
 </script>
@@ -64,8 +58,14 @@
                     min-width: 400px;
 
                     .playlist-name {
-                        color: #555;
+                        color: lighten(#555, 30%);
+                        font-size: 24px;
                         margin-left: 20px;
+
+                        &:hover {
+                            color: #555;
+
+                        }
                     }
 
                     .playlist-username {

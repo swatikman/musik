@@ -7,19 +7,23 @@ export default {
         mySongs: []
     },
     mutations: {
-        ADD_MY_SONGS(state, {data}) {
-            state.mySongs.push(...data)
+        SET_MY_SONGS(state, {data}) {
+            state.mySongs = data
         }
     },
     actions: {
-        async fetchMySongs({commit}, payload) {
-            const token = await getUserToken();
+        async fetchMySongs({commit, dispatch}, payload) {
+            const token = await dispatch('getUserToken');
             const {data} = await axios.get(`${BASE_URL}/api/songs?type=my`, {headers: {token}});
-            commit('ADD_MY_SONGS', {data})
+            commit('SET_MY_SONGS', {data})
         },
 
-        async uploadSong({commit}, {formData}) {
-            const token = await getUserToken();
+        async fetchPopularSongs() {
+            const {data} = await axios.get(`${BASE_URL}/api/songs?type=popular`);
+        },
+
+        async uploadSong({commit, dispatch}, {formData}) {
+            const token = await dispatch('getUserToken');
             return axios.post(`${BASE_URL}/api/songs`, formData,
                 {headers: {
                     'Content-Type': 'multipart/form-data',

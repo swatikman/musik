@@ -4,8 +4,13 @@ import 'firebase/auth';
 let currentUser = null;
 
 export function startAuthStateChangeListener() {
-    firebase.auth().onAuthStateChanged((user) => {
-        currentUser = user;
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+            localStorage.setItem("loggedIn", "true")
+        } else {
+            localStorage.removeItem("loggedIn")
+        }
+        this.$store.dispatch("autoSignIn", user);
     });
 }
 

@@ -1,22 +1,24 @@
 <template>
-    <div class="new-playlist">
-        <form>
-            <input type="text" placeholder="Name" class="playlist-name" v-model="name">
-            <div>
-                <input type="radio" value=true id="public" v-model="sharedWithAll">
-                <label for="public">Public</label>
-                <input type="radio" value=false id="private" v-model="sharedWithAll">
-                <label for="private">Private</label>
-            </div>
-            <Button @click.native="createPlaylist">Create</Button>
-        </form>
-    </div>
+    <modal name="modal-new-playlist" height="auto">
+        <div class="new-playlist">
+            <form>
+                <input type="text" placeholder="Name" class="playlist-name" v-model="name">
+                <div>
+                    <input type="radio" value=true id="public" v-model="sharedWithAll">
+                    <label for="public">Public</label>
+                    <input type="radio" value=false id="private" v-model="sharedWithAll">
+                    <label for="private">Private</label>
+                </div>
+                <Button @click.native="createPlaylist">Create</Button>
+            </form>
+        </div>
+    </modal>
 </template>
 
 <script>
     import Button from "../shared/Button";
     export default {
-        name: "NewPlaylist",
+        name: "ModalNewPlaylist",
         components: {Button},
         data() {
             return {
@@ -39,16 +41,14 @@
                 }
                 this.foundTracks = foundTracks;
             },
-            createPlaylist() {
+            async createPlaylist() {
                 const data = {name: this.name, sharedWithAll: this.sharedWithAll};
-                this.$http.post('http://172.20.0.2:3000/api/playlists', data, {
-                    headers: {
-                        token: localStorage.getItem("token")
-                    }
-                }).then(res => {
-                    // TODO: do something
-                }).catch(e => {
-                })
+                try {
+                    await this.$store.dispatch('createPlaylist', {data});
+                    console.log('good')
+                } catch (e) {
+                    console.log('bad', e)
+                }
             }
         }
     }

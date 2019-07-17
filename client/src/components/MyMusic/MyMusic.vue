@@ -2,7 +2,7 @@
     <div class="my-music-container">
         <div class="my-playlists">
             <div class="title">Your playlists</div>
-            <Button>Add new playlist</Button>
+            <Button @click.native="onAddPlaylistClick">Add new playlist</Button>
             <MyPlaylists/>
         </div>
         <div class="my-songs">
@@ -11,6 +11,7 @@
             <UploadSongForm @uploaded="onSongUpload" :show="showUploadNewSong"/>
             <MySongs/>
         </div>
+        <ModalNewPlaylist />
     </div>
 </template>
 
@@ -19,10 +20,11 @@
     import Button from "../shared/Button";
     import UploadSongForm from "./UploadSongForm";
     import MySongs from "./MySongs";
+    import ModalNewPlaylist from "./ModalNewPlaylist";
 
     export default {
         name: "MyMusic",
-        components: {MySongs, UploadSongForm, Button, MyPlaylists},
+        components: {ModalNewPlaylist, MySongs, UploadSongForm, Button, MyPlaylists},
         data() {
             return {
                 showUploadNewSong: false,
@@ -36,6 +38,9 @@
                 setTimeout(() => {
                     this.showUploadNewSong = false;
                 }, 2000);
+            },
+            onAddPlaylistClick() {
+                this.$modal.show('modal-new-playlist');
             }
         }
     }

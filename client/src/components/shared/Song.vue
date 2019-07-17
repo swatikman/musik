@@ -50,19 +50,26 @@
         padding: 10px 20px;
         border-bottom: 1px solid #c8c8c8;
         position: relative;
+        color: #555;
+
+        &:hover {
+            color: darken(#555, 100%);
+
+            .left .description .name {
+                color: darken(#999, 100%);
+            }
+        }
 
         .left {
             .play-btn {
                 margin-right: 20px;
                 cursor: pointer;
-                color: #555;
             }
 
             .description {
                 font-size: 16px;
 
                 .singer {
-                    color: #555;
                 }
 
                 .name {
@@ -82,7 +89,6 @@
             .song-actions {
                 padding: 0 10px;
                 cursor: pointer;
-                color: #555;
             }
         }
     }

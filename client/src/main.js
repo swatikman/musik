@@ -16,10 +16,12 @@ Vue.use(VModal);
 Vue.use(VueResource);
 
 firebase.initializeApp(firebaseAuth.firebaseConfig);
-firebaseAuth.startAuthStateChangeListener();
 
 new Vue({
     render: h => h(App),
     store,
-    router
+    router,
+    created() {
+        firebaseAuth.startAuthStateChangeListener.call(this);
+    }
 }).$mount('#app');
