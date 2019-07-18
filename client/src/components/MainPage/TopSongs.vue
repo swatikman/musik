@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import Songs from "./shared/Songs";
+    import Songs from "../shared/Songs";
     export default {
         name: "TopSongs",
         components: {Songs},

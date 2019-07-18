@@ -16,7 +16,7 @@
 </template>
 
 <script>
-    import Song from "./shared/Song";
+    import Song from "../shared/Song";
 
     export default {
         name: "MyPlaylists",

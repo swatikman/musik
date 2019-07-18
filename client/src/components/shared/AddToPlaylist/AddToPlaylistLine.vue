@@ -14,7 +14,7 @@
         props: ['playlist', 'songId'],
         computed: {
             isAdded() {
-                return this.playlist.songs.some(song => song.id === this.songId)
+                return this.playlist.songs && this.playlist.songs.some(song => song.id === this.songId)
             }
         }
     }

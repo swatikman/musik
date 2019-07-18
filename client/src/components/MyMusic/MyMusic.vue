@@ -16,7 +16,7 @@
 </template>
 
 <script>
-    import MyPlaylists from "../MyPlaylists";
+    import MyPlaylists from "./MyPlaylists";
     import Button from "../shared/Button";
     import UploadSongForm from "./UploadSongForm";
     import MySongs from "./MySongs";

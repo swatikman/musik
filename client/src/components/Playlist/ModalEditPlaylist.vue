@@ -28,16 +28,10 @@
         name: "ModalEditPlaylist",
         components: {Button},
         props: ['playlist'],
-        watch: {
-            playlist(value) {
-                this.title = value.name;
-                this.sharedWithAll = value.sharedWithAll;
-            }
-        },
         data() {
             return {
-                title: '',
-                sharedWithAll: false
+                title: this.playlist.name,
+                sharedWithAll: this.playlist.sharedWithAll
             }
         },
         methods: {

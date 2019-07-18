@@ -9,7 +9,7 @@ services:
     volumes:
       - ./client/src:/app/src
     ports:
-      - 4040:8080
+      - 8080:8080
     networks:
       - main
 

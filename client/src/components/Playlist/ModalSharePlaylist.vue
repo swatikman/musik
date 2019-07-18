@@ -26,7 +26,7 @@
         props: ['playlistId', 'sharedLink'],
         watch: {
             sharedLink(value) {
-                this.link = `${SITE_URL}/playlists/${value}`;
+                this.link = value;
             }
         },
         data() {
@@ -46,7 +46,7 @@
             },
             async generate() {
                 const {sharedLink} = await this.$store.dispatch("generateSharePlaylistLink", {playlistId: this.playlistId});
-                this.link = `${SITE_URL}/playlists/${sharedLink}`;
+                this.link = sharedLink;
                 this.copied = false;
             },
             close() {

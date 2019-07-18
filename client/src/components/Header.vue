@@ -1,6 +1,17 @@
 <template>
     <div class="header">
         <router-link to="/" class="header-title" tag="span">musik</router-link>
+        <div class="search-block">
+            <input
+                type="text"
+                class="main-input search"
+                v-model="search"
+                placeholder="Search" />
+            <font-awesome-icon
+                class="search-button"
+                icon="search"
+                @click="performSearch"/>
+        </div>
         <div class="right-actions">
             <template v-if="user">
                 <router-link to="/my-music">
@@ -29,15 +40,36 @@
         computed: {
             user() {
                 return this.$store.getters.getCurrentUser();
+            },
+        },
+        created() {
+            if (this.$route.path === '/search') {
+                this.search = this.$route.query.q;
+            }
+        },
+        watch: {
+            '$route' (to, from) {
+                if (to.path === '/search') {
+                    this.search = to.query.q;
+                }
+            }
+        },
+        data() {
+            return {
+                search: ''
             }
         },
         methods: {
+            performSearch() {
+                this.$router.push(`/search?q=${this.search}`);
+            },
             logout() {
                 this.$store.dispatch('logout');
             }
         }
     }
 </script>
+
 
 <style scoped lang="scss">
     .header {
@@ -51,8 +83,20 @@
             cursor: pointer;
         }
 
-        a {
-            text-decoration: none;
+        .search-block {
+            display: flex;
+            align-items: center;
+            position: relative;
+
+            .search {
+                width: 500px;
+            }
+
+            .search-button {
+                position: absolute;
+                right: 10px;
+                cursor: pointer;
+            }
         }
 
         .header-title {
@@ -72,6 +116,7 @@
 
             .links {
                 color: #36c3fe;
+
                 &:hover {
                     text-decoration: underline;
                 }

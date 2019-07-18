@@ -36,7 +36,7 @@ export default {
                 }
             ]
         }],
-        playlist: {}
+        playlist: null
     },
     mutations: {
         SET_MY_PLAYLISTS (state, {data}) {
@@ -92,8 +92,8 @@ export default {
             });
         },
 
-        generateSharePlaylistLink({dispatch}, {playlistId}) {
-            return new Promise(async (resolve, reject) => {
+        generateSharePlaylistLink({commit, dispatch}, {playlistId}) {
+            return loadingPromise(commit, async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const {data} = await axios.post(`${BASE_URL}/api/playlists/${playlistId}/sharedLink`,
@@ -120,8 +120,7 @@ export default {
         },
 
         editPlaylist({commit, dispatch}, {id, data}) {
-            return new Promise(async (resolve, reject) => {
-                commit('SET_LOADING', true);
+            return loadingPromise(commit, async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const res = await axios.put(`${BASE_URL}/api/playlists/${id}`,
@@ -131,8 +130,21 @@ export default {
                 } catch (e) {
                     reject(e)
                 }
-                commit('SET_LOADING', false);
             })
+        },
+
+        deletePlaylist({commit, dispatch}, {id}) {
+            return loadingPromise(commit,
+                async (resolve, reject) => {
+                    try {
+                        const token = await dispatch('getUserToken');
+                        const res = await axios.delete(`${BASE_URL}/api/playlists/${id}`,{headers: {token}});
+                        dispatch('clearPlalist');
+                        resolve(res)
+                    } catch (e) {
+                        reject(e)
+                    }
+                });
         },
 
         clearPlaylist({commit}) {
@@ -150,3 +162,16 @@ export default {
         }
     }
 }
+
+const loadingPromise = (commit, promise) => {
+    return new Promise(async (resolve, reject) => {
+        commit('SET_LOADING', true);
+        try {
+            const data = await new Promise(promise);
+            resolve(data);
+        } catch (e) {
+            reject(e)
+        }
+        commit('SET_LOADING', false);
+    })
+};

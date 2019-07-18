@@ -2,7 +2,7 @@
     <modal name="add-to-playlist" height="auto">
         <div class="add-to-playlist">
             <div class="title">Add song to playlist</div>
-            <AddToPlaylistLine
+            <add-to-playlist-line
                 v-for="playlist in playlists"
                 :key="playlist.id"
                 :playlist="playlist"

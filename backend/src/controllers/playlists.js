@@ -11,8 +11,8 @@ module.exports.get = async (request, response) => {
     let query = {};
     if (request.query.type === 'my') {
         query = {userId: request.uid};
-    } else if (request.query.type === 'shared') {
-        query = {sharedWith: request.uid};
+    } else if (request.query.type === 'popular') {
+        query = {sharedWithAll: 'true'};
     }
     const snapshot = await getPlaylistsSnapshot(query);
 
@@ -32,7 +32,6 @@ module.exports.getOne = async (request, response) => {
 };
 
 module.exports.create = async (request, response) => {
-    console.log(request.body)
     await playlists.add({
         ...request.body,
         owner: request.uid,
@@ -53,10 +52,11 @@ module.exports.update = async (request, response) => {
 };
 
 module.exports.delete = async (request, response) => {
-    const snapshot = await getPlaylistsSnapshot({playlistId: request.params.id, userId: request.uid});
+    const {params: {id}, uid: userId} = request;
+    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
 
-    if (snapshot) {
-        snapshot.forEach(async playlist => await playlist.ref.delete());
+    if (playlist) {
+        playlist.ref.delete();
         response.send({success: 'Playlist deleted'});
     } else {
         response.status(404).send({error: 'Playlist not found'});
@@ -64,18 +64,20 @@ module.exports.delete = async (request, response) => {
 };
 
 module.exports.createSharedLink = async (request, response) => {
-    const sharedLink = uuidv4();
+    const {params: {id}, uid: userId} = request;
+    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
+    const sharedLink = `http://localhost:8080/playlist/${uuidv4()}`;
 
-    await playlists.doc(request.params.id).update({
-        sharedLink
-    });
+    await playlist.ref.update({sharedLink});
 
     response.send({sharedLink})
 };
 
 module.exports.getSharedLink = async (request, response) => {
-    const playlist = await playlists.doc(request.params.id).get();
+    const {params: {id}, uid: userId} = request;
+    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
     const sharedLink = playlist.data().sharedLink;
+
     if (sharedLink) {
         response.send({sharedLink})
     } else {
@@ -134,13 +136,13 @@ const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith}) =
 };
 
 const getPlaylist = async (playlistId, userId) => {
-    const snapshot = await getFirstItemSnapshot({playlistId});
+    const playlist = await getFirstItemSnapshot({playlistId});
 
-    const data = snapshot.data();
+    const data = playlist.data();
     if (data.sharedWithAll
         || data.owner === userId
         || data.sharedWith.find(sharedUserId => sharedUserId === userId)) {
-        return snapshot;
+        return playlist;
     }
 };
 

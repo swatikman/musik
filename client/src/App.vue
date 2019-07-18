@@ -45,10 +45,23 @@
 
     a {
         text-decoration: none;
+        color: #00B7FF;
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
     .disabled {
         pointer-events: none;
         opacity: 0.5;
+    }
+
+    .main-input {
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        padding: 8px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555;
     }
 </style>
