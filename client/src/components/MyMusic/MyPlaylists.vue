@@ -1,26 +1,18 @@
 <template>
     <div class="playlists">
         <div class="playlists-list">
-            <div v-for="playlist in playlists" class="playlists-item">
-                <div class="playlist-image">
-
-                </div>
-                <div class="playlist-info">
-                    <router-link class="playlist-name" :to="'/playlist/' + playlist.id">{{playlist.name}}</router-link>
-                    <div class="playlist-username">{{playlist.username}}</div>
-                    <Song v-for="song in playlist.songs" :key="song.id" :song="song"></Song>
-                </div>
-            </div>
+            <MyPlaylist v-for="playlist in playlists" :playlist="playlist"/>
         </div>
     </div>
 </template>
 
 <script>
     import Song from "../shared/Song";
+    import MyPlaylist from "./MyPlaylist";
 
     export default {
         name: "MyPlaylists",
-        components: {Song},
+        components: {MyPlaylist, Song},
         created() {
             this.$store.dispatch("fetchMyPlaylists")
         },

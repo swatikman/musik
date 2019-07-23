@@ -6,11 +6,12 @@
                 type="text"
                 class="main-input search"
                 v-model="search"
+                v-on:keyup.enter="performSearch"
                 placeholder="Search" />
             <font-awesome-icon
                 class="search-button"
                 icon="search"
-                @click="performSearch"/>
+                @click="performSearch" />
         </div>
         <div class="right-actions">
             <template v-if="user">
@@ -52,6 +53,9 @@
                 if (to.path === '/search') {
                     this.search = to.query.q;
                 }
+            },
+            search(newValue) {
+                this.$store.dispatch('setQuery', {query: newValue})
             }
         },
         data() {

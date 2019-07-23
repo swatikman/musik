@@ -19,7 +19,6 @@
 
 <script>
     import Button from "../shared/Button";
-    import {SITE_URL} from "../../store/utils";
     export default {
         name: "ShareDialog",
         components: {Button},

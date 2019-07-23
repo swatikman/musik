@@ -5,9 +5,9 @@ import MainPage from "./components/MainPage/MainPage";
 import Playlists from "./components/MyMusic/MyPlaylists";
 import MyMusic from "./components/MyMusic/MyMusic";
 import NewPlaylist from "./components/MyMusic/ModalNewPlaylist";
-import Playlist from "./components/Playlist/Playlist";
 import SignUp from "./components/SignUp";
 import SearchPage from "./components/Search/SearchPage";
+import PlaylistPage from "./components/Playlist/PlaylistPage";
 
 Vue.use(VueRouter);
 
@@ -32,7 +32,7 @@ const vueRouter = new VueRouter({
             name: 'main',
             component: MainPage
         },{
-            path: '/search?q=:query',
+            path: '/search',
             name: 'search',
             component: SearchPage
         }, {
@@ -42,7 +42,7 @@ const vueRouter = new VueRouter({
         }, {
             path: '/playlist/:id',
             name: 'playlist',
-            component: Playlist
+            component: PlaylistPage
         }, {
             path: '/my-music',
             name: 'my-music',

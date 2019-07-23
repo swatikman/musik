@@ -27,7 +27,8 @@ app.use(fileUpload({
     tempFileDir : '/tmp/'
 }));
 
-app.use('/api/', require('./routes/index'));
+app.use('/api', require('./routes/everything'));
+// app.use('/api/', require('./routes/index'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/account', require('./routes/account'));
 app.use('/api/songs', require('./routes/songs'));

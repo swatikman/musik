@@ -8,11 +8,14 @@ const playlists = firestore().collection('playlists');
 const songs = firestore().collection('songs');
 
 module.exports.get = async (request, response) => {
+    const {type, q} = request.query;
     let query = {};
-    if (request.query.type === 'my') {
+    if (type === 'my') {
         query = {userId: request.uid};
-    } else if (request.query.type === 'popular') {
+    } else if (type === 'popular') {
         query = {sharedWithAll: 'true'};
+    } else if (q) {
+        query = {name: q}
     }
     const snapshot = await getPlaylistsSnapshot(query);
 
@@ -118,7 +121,7 @@ const getFirstItemSnapshot = async (args) => {
     return returnItem;
 };
 
-const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith}) => {
+const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith, name}) => {
     let query = playlists;
     if (playlistId) {
         query = query.where(documentId, '==', playlistId)
@@ -131,6 +134,9 @@ const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith}) =
     }
     if (sharedWith) {
         query = query.where('sharedWith', '==', sharedWith);
+    }
+    if (name) {
+        query = query.where('name', '==', name);
     }
     return query.get();
 };

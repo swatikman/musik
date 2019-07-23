@@ -1,6 +1,8 @@
-import {BASE_URL} from "../utils";
+import {BASE_URL, loadingPromise} from "../utils";
 import axios from "axios";
 import Vue from "vue";
+
+const LOADER_PLAYLIST = 'LOADER_PLAYLSIT';
 
 export default {
     state: {
@@ -52,7 +54,7 @@ export default {
     },
     actions: {
         fetchPlaylist({dispatch, commit}, {id}) {
-            return new Promise(async(resolve, reject) => {
+            return loadingPromise(commit, LOADER_PLAYLIST, async(resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const {data} = await axios.get(`${BASE_URL}/api/playlists/${id}`, {headers: {token}})
@@ -65,7 +67,8 @@ export default {
         },
 
         fetchMyPlaylists({commit, dispatch}, payload) {
-            return new Promise(async (resolve, reject) => {
+            return loadingPromise(commit, LOADER_PLAYLIST,
+                async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const playlists = await axios.get(`${BASE_URL}/api/playlists`, {headers: {token}});
@@ -74,7 +77,6 @@ export default {
                 } catch (e) {
                     reject(e);
                 }
-
             })
         },
 
@@ -93,7 +95,7 @@ export default {
         },
 
         generateSharePlaylistLink({commit, dispatch}, {playlistId}) {
-            return loadingPromise(commit, async (resolve, reject) => {
+            return loadingPromise(commit, LOADER_PLAYLIST, async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const {data} = await axios.post(`${BASE_URL}/api/playlists/${playlistId}/sharedLink`,
@@ -109,9 +111,7 @@ export default {
             return new Promise(async(resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
-                    // console.log(data)
                     const res = await axios.post(`${BASE_URL}/api/playlists`, data,{headers: {token}});
-                    // commit('SET_PLAYLIST', res.data);
                     resolve(res.data)
                 } catch (e) {
                     reject(e);
@@ -120,7 +120,8 @@ export default {
         },
 
         editPlaylist({commit, dispatch}, {id, data}) {
-            return loadingPromise(commit, async (resolve, reject) => {
+            return loadingPromise(commit, LOADER_PLAYLIST,
+                async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
                     const res = await axios.put(`${BASE_URL}/api/playlists/${id}`,
@@ -134,7 +135,7 @@ export default {
         },
 
         deletePlaylist({commit, dispatch}, {id}) {
-            return loadingPromise(commit,
+            return loadingPromise(commit, LOADER_PLAYLIST,
                 async (resolve, reject) => {
                     try {
                         const token = await dispatch('getUserToken');
@@ -162,16 +163,3 @@ export default {
         }
     }
 }
-
-const loadingPromise = (commit, promise) => {
-    return new Promise(async (resolve, reject) => {
-        commit('SET_LOADING', true);
-        try {
-            const data = await new Promise(promise);
-            resolve(data);
-        } catch (e) {
-            reject(e)
-        }
-        commit('SET_LOADING', false);
-    })
-};

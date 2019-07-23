@@ -4,6 +4,7 @@ import songs from "./modules/songs";
 import playlists from "./modules/playlists";
 import auth from "./modules/auth";
 import shared from "./modules/shared";
+import search from "./modules/search";
 
 Vue.use(Vuex);
 
@@ -12,7 +13,8 @@ const store = new Vuex.Store({
         songs,
         playlists,
         auth,
-        shared
+        shared,
+        search
     }
 });
 

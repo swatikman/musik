@@ -2,6 +2,7 @@
 export default {
     state: {
         loading: false,
+        loaders: [],
         error: ''
     },
     mutations: {
@@ -10,6 +11,12 @@ export default {
         },
         SET_ERROR(state, error) {
             state.error = error
+        },
+        ADD_LOADER(state, loader) {
+            state.loaders = [...state.loaders, loader];
+        },
+        REMOVE_LOADER(state, loader) {
+            state.loaders = state.loaders.filter(item => item !== loader);
         }
     },
     actions: {
