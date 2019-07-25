@@ -5,17 +5,29 @@ const playlists = firestore().collection('playlists');
 const songs = firestore().collection('songs');
 
 module.exports.search = async (request, response) => {
-    const query = request.query.q;
+    const {type, q: query} = request.query;
 
+    if (type === 'playlist') {
+        const playlistsData = await searchPlaylists(query);
+        response.send(playlistsData)
+    } else if (type === 'song') {
+        const songsData = await searchSongs(query);
+        response.send(songsData);
+    } else {
+        const playlistsData = await searchPlaylists(query);
+        const songsData = await searchSongs(query);
+
+        response.send([...playlistsData, ...songsData ])
+    }
+};
+
+const searchPlaylists = async (query) => {
     const playlistsSnapshot = await playlists.where('name', '>=', query).get();
 
     const playlistsData = await populate(playlistsSnapshot, ['songs']);
     playlistsData.forEach(playlist => playlist.type = 'playlist');
 
-    const songsData = await searchSongs(query);
-    songsData.forEach(song => song.type = 'song');
-
-    response.send([...playlistsData, ...songsData ])
+    return playlistsData;
 };
 
 const searchSongs = async (query) => {
@@ -43,5 +55,7 @@ const searchSongs = async (query) => {
         }
         mergedSongs.push(song);
     }
+
+    mergedSongs.forEach(song => song.type = 'song');
     return mergedSongs;
 };

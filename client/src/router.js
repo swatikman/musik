@@ -8,6 +8,7 @@ import NewPlaylist from "./components/MyMusic/ModalNewPlaylist";
 import SignUp from "./components/SignUp";
 import SearchPage from "./components/Search/SearchPage";
 import PlaylistPage from "./components/Playlist/PlaylistPage";
+import MyProfile from "./components/MyProfile/MyProfile";
 
 Vue.use(VueRouter);
 
@@ -20,7 +21,7 @@ const vueRouter = new VueRouter({
             meta: {
                 guest: true
             }
-        },{
+        }, {
             path: '/sign-up',
             name: 'sign-up',
             component: SignUp,
@@ -31,18 +32,22 @@ const vueRouter = new VueRouter({
             path: '/',
             name: 'main',
             component: MainPage
-        },{
+        }, {
+            path: '/my-profile',
+            name: 'user',
+            component: MyProfile
+        }, {
             path: '/search',
             name: 'search',
-            component: SearchPage
+            component: SearchPage,
+        }, {
+            path: '/playlist/:id',
+            name: 'playlist',
+            component: PlaylistPage,
         }, {
             path: '/playlists',
             name: 'playlists',
             component: Playlists
-        }, {
-            path: '/playlist/:id',
-            name: 'playlist',
-            component: PlaylistPage
         }, {
             path: '/my-music',
             name: 'my-music',
@@ -50,7 +55,7 @@ const vueRouter = new VueRouter({
             meta: {
                 requiresAuth: true
             }
-        },{
+        }, {
             path: '/new-playlist',
             name: '/new-playlist',
             component: NewPlaylist,
@@ -67,7 +72,7 @@ vueRouter.beforeEach((to, from, next) => {
             next()
         } else {
             next({
-                name : 'sign-in'
+                name: 'sign-in'
             })
         }
     } else {

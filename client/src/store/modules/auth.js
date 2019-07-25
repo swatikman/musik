@@ -37,15 +37,18 @@ export default {
         async autoSignIn({commit}, user) {
             commit('SET_USER', user)
         },
+
         async getUserToken({state}) {
             return new Promise((resolve, reject) => {
                 if (state.user) {
                     resolve(state.user.getIdToken());
                 } else {
-                    reject(new Error('Not logged in'))
+                    resolve(null);
+                    // reject(new Error('Not logged in'))
                 }
             });
         },
+
         async logout({commit}) {
             await firebase.auth().signOut();
             commit('SET_USER', null)

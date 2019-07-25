@@ -1,20 +1,12 @@
 <template>
     <div class="header">
         <router-link to="/" class="header-title" tag="span">musik</router-link>
-        <div class="search-block">
-            <input
-                type="text"
-                class="main-input search"
-                v-model="search"
-                v-on:keyup.enter="performSearch"
-                placeholder="Search" />
-            <font-awesome-icon
-                class="search-button"
-                icon="search"
-                @click="performSearch" />
-        </div>
+        <header-search />
         <div class="right-actions">
             <template v-if="user">
+                <router-link to="/my-profile">
+                    <div class="links">My Profile</div>
+                </router-link>
                 <router-link to="/my-music">
                     <div class="links">My Music</div>
                 </router-link>
@@ -34,46 +26,24 @@
 
 <script>
     import Button from "./shared/Button";
+    import HeaderSearch from "./HeaderSearch";
 
     export default {
         name: "Header",
-        components: {Button},
+        components: {HeaderSearch, Button},
         computed: {
             user() {
                 return this.$store.getters.getCurrentUser();
             },
         },
-        created() {
-            if (this.$route.path === '/search') {
-                this.search = this.$route.query.q;
-            }
-        },
-        watch: {
-            '$route' (to, from) {
-                if (to.path === '/search') {
-                    this.search = to.query.q;
-                }
-            },
-            search(newValue) {
-                this.$store.dispatch('setQuery', {query: newValue})
-            }
-        },
-        data() {
-            return {
-                search: ''
-            }
-        },
         methods: {
-            performSearch() {
-                this.$router.push(`/search?q=${this.search}`);
-            },
-            logout() {
-                this.$store.dispatch('logout');
+            async logout() {
+                await this.$store.dispatch('logout');
+                this.$router.push('/');
             }
         }
     }
 </script>
-
 
 <style scoped lang="scss">
     .header {
@@ -85,22 +55,6 @@
 
         .header-title {
             cursor: pointer;
-        }
-
-        .search-block {
-            display: flex;
-            align-items: center;
-            position: relative;
-
-            .search {
-                width: 500px;
-            }
-
-            .search-button {
-                position: absolute;
-                right: 10px;
-                cursor: pointer;
-            }
         }
 
         .header-title {
@@ -115,11 +69,12 @@
             align-items: center;
 
             .btn {
-                margin: 0px 20px;
+                margin-right: 20px;
             }
 
             .links {
                 color: #36c3fe;
+                margin-right: 20px;
 
                 &:hover {
                     text-decoration: underline;

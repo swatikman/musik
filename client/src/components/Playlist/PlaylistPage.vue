@@ -10,7 +10,7 @@
                         icon="lock"
                         title="Private"/>
                 </div>
-                <div class="actions">
+                <div v-if="user.uid === playlist.owner.id" class="actions">
                     <Button @click.native="onShareClick">Share</Button>
                     <Button @click.native="onEditClick">Edit</Button>
                     <Button @click.native="onDeleteClick" type="danger">Delete</Button>
@@ -31,6 +31,9 @@
             <ModalConfirm title="Delete playlist" description="Are you sure you want to delete this playlist?"
                           @submit="deletePlaylist"/>
         </template>
+        <div v-if="error" class="error">
+            <h1>Playlist not found</h1>
+        </div>
     </div>
 </template>
 
@@ -48,11 +51,18 @@
             this.fetch();
         },
         computed: {
+            user() {
+                return this.$store.getters.getCurrentUser();
+            },
             playlist() {
                 return this.$store.getters.getPlaylist();
             },
             loading() {
-                return this.$store.getters.isLoading() ? 'disabled' : '';
+                return this.$store.getters.isPlaylistLoading() ? 'disabled' : '';
+            },
+            error() {
+                console.log(this.$store.getters.getError())
+                return this.$store.getters.getError()
             }
         },
         destroyed() {
@@ -61,6 +71,7 @@
         methods: {
             async fetch() {
                 this.$store.dispatch("fetchPlaylist", {id: this.$route.params.id});
+
             },
             onShareClick() {
                 this.$modal.show('modal-share-playlist');
@@ -141,6 +152,10 @@
                 }
 
             }
+        }
+
+        .error {
+            margin: 100px auto 0;
         }
     }
 </style>

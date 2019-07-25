@@ -41,6 +41,9 @@
                 } catch (e) {
                     console.log('bad', e)
                 }
+            },
+            cancel() {
+                this.$modal.hide('modal-new-playlist');
             }
         }
     }

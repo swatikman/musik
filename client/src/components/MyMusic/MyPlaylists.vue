@@ -1,7 +1,7 @@
 <template>
     <div class="playlists">
         <div class="playlists-list">
-            <MyPlaylist v-for="playlist in playlists" :playlist="playlist"/>
+            <MyPlaylist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id"/>
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
         },
         computed: {
             playlists() {
-                return this.$store.getters.myPlaylists()
+                return this.$store.getters.getMyPlaylists()
             }
         }
     }

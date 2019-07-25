@@ -3,10 +3,10 @@
         <div class="top-playlists-title">Top shared playlists</div>
         <div class="top-playlists-list">
             <div v-for="playlist in playlists" class="top-playlists-list-item">
-                <div class="playlist-image">
+                <div class="playlist-image" @click="toPlaylist(playlist.id)">
                 </div>
-                <span class="playlist-description name">{{playlist.name}}</span>
-                <span class="playlist-description user">{{playlist.username}}</span>
+                <span class="playlist-description name" @click="toPlaylist(playlist.id)">{{playlist.name}}</span>
+                <span class="playlist-description user">{{playlist.owner.displayName}}</span>
             </div>
         </div>
     </div>
@@ -15,20 +15,18 @@
 <script>
     export default {
         name: "TopPlaylists",
-        data() {
-            const playlists = [];
-            for (let i = 0; i < 10; i++) {
-                playlists.push({
-                    name: 'Energy Music',
-                    username: 'User#2528'
-                })
-            }
-            return {
-                playlists
+        created() {
+            this.$store.dispatch('fetchPopularPlaylists');
+        },
+        computed: {
+            playlists() {
+                return this.$store.getters.getPlaylists()
             }
         },
         methods: {
-
+            toPlaylist(id) {
+                this.$router.push(`/playlist/${id}`)
+            }
         }
     }
 </script>
@@ -63,6 +61,10 @@
                     background: #00B7FF;
                     cursor: pointer;
                     margin-bottom: 5px;
+
+                    &:hover {
+                        opacity: 0.7;
+                    }
                 }
 
                 .playlist-description {
@@ -80,6 +82,10 @@
                     &.user {
                         font-size: 16px;
                         opacity: 0.7;
+                    }
+
+                    &:hover {
+                        opacity: 0.5;
                     }
                 }
             }

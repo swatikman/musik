@@ -6,7 +6,8 @@ const LOADER_PLAYLIST = 'LOADER_PLAYLSIT';
 
 export default {
     state: {
-        myPlaylists: [{
+        myPlaylists: [],
+        playlists: [{
             name: 'MY FAVOURITE SONGS',
             username: 'Jacob Peralta99',
             songs: [
@@ -38,29 +39,43 @@ export default {
                 }
             ]
         }],
-        playlist: null
+        playlist: null,
+        error: null
     },
     mutations: {
+        SET_PLAYLISTS (state, {data}) {
+            state.playlists = data;
+        },
         SET_MY_PLAYLISTS (state, {data}) {
             state.myPlaylists = data;
         },
         TOGGLE_SONG_IN_PLAYLIST(state, {data}) {
-            const index = state.myPlaylists.findIndex(playlist => data.id === playlist.id);
-            Vue.set(state.myPlaylists, index, data);
+            const index = state.playlists.findIndex(playlist => data.id === playlist.id);
+            Vue.set(state.playlists, index, data);
         },
         SET_PLAYLIST (state, playlist) {
             state.playlist = playlist;
+        },
+        SET_ERROR (state, error) {
+            state.error = error;
         }
     },
     actions: {
         fetchPlaylist({dispatch, commit}, {id}) {
+            dispatch('clearPlaylist');
             return loadingPromise(commit, LOADER_PLAYLIST, async(resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
-                    const {data} = await axios.get(`${BASE_URL}/api/playlists/${id}`, {headers: {token}})
+                    const headers = {};
+                    if (token) {
+                        headers.token = token;
+                    }
+                    const {data} = await axios.get(`${BASE_URL}/api/playlists/${id}`, {headers});
                     commit('SET_PLAYLIST', data);
                     resolve(data)
                 } catch (e) {
+                    const {data, status} = e.response;
+                    commit('SET_ERROR', {data, status});
                     // reject(e);
                 }
             });
@@ -71,13 +86,26 @@ export default {
                 async (resolve, reject) => {
                 try {
                     const token = await dispatch('getUserToken');
-                    const playlists = await axios.get(`${BASE_URL}/api/playlists`, {headers: {token}});
+                    const playlists = await axios.get(`${BASE_URL}/api/playlists?type=my`, {headers: {token}});
                     commit('SET_MY_PLAYLISTS', {data: playlists.data});
                     resolve(playlists)
                 } catch (e) {
                     reject(e);
                 }
             })
+        },
+
+        fetchPopularPlaylists({commit}) {
+            return loadingPromise(commit, LOADER_PLAYLIST,
+                async (resolve, reject) => {
+                    try {
+                        const playlists = await axios.get(`${BASE_URL}/api/playlists?type=popular`);
+                        commit('SET_PLAYLISTS', {data: playlists.data});
+                        resolve(playlists)
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
         },
 
         toggleSongInPlaylist({commit, dispatch}, {playlistId, songId}) {
@@ -149,17 +177,29 @@ export default {
         },
 
         clearPlaylist({commit}) {
-            commit('SET_PLAYLIST', null)
+            commit('SET_PLAYLIST', null);
+            commit('SET_ERROR', null);
         }
     },
     getters: {
-        myPlaylists(state) {
+        getPlaylists(state) {
+            return () => {
+                return state.playlists
+            };
+        },
+        getMyPlaylists(state) {
             return () => {
                 return state.myPlaylists
             };
         },
+        isPlaylistLoading(state, getters) {
+            return () => getters.hasLoader(LOADER_PLAYLIST)
+        },
         getPlaylist(state) {
             return () => state.playlist
+        },
+        getError(state) {
+            return () => state.error;
         }
     }
 }

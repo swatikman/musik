@@ -26,13 +26,11 @@
             }
         },
         computed: {
+            playlists() {
+                return this.$store.getters.getMyPlaylists()
+            },
             user() {
                 return this.$store.getters.getCurrentUser()
-            }
-        },
-        data() {
-            return {
-                playlists: []
             }
         },
         methods: {
@@ -46,9 +44,8 @@
                     console.log('Error')
                 }
             },
-            async fetch() {
-                const {data} = await this.$store.dispatch("fetchMyPlaylists");
-                this.playlists = data;
+            fetch() {
+                this.$store.dispatch("fetchMyPlaylists");
             }
         }
     }

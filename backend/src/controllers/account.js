@@ -6,17 +6,16 @@ const actionCodeSettings = {
 };
 
 module.exports.signUp = async (request, response) => {
-    try {
-        await admin.auth().createUser({
-            email: request.body.email,
-            password: request.body.password,
-            displayName: request.body.name,
-            emailVerified: false
-        });
-        response.send({success: 'User is registered'})
-    } catch (e) {
-        response.status(422).send({error: e.message})
-    }
+    const user = await admin.auth().createUser({
+        email: request.body.email,
+        password: request.body.password,
+        displayName: request.body.name,
+        emailVerified: false
+    });
+    await db.collection('users').doc(user.uid).set({
+        displayName: user.displayName || '',
+    });
+    response.send({success: 'User is registered'})
 };
 
 module.exports.get = async (request, response) => {
@@ -30,7 +29,12 @@ module.exports.get = async (request, response) => {
 };
 
 module.exports.update = async (request, response) => {
+    const user = await admin.auth().getUser(uid);
 
+    await db.collection('users').doc(user.uid).set({
+        displayName: user.displayName || '',
+    });
+    response.send({success: 'User is registered'})
 };
 
 

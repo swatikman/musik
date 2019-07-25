@@ -26,6 +26,11 @@ export default {
         isLoading(state) {
             return () => state.loading
         },
+        hasLoader(state) {
+            return (loader) => {
+                return !!state.loaders.find(item => loader === item)
+            }
+        },
         error(state) {
             return () => state.error
         }

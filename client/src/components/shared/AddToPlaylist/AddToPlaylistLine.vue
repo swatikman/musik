@@ -3,7 +3,7 @@
         <router-link :to="`/playlist/${this.playlist.id}`">
             <div>{{playlist.name}}</div>
         </router-link>
-        <font-awesome-icon v-if="isAdded" class="remove-btn" icon="coffee" @click="$emit('toggle-song', playlist.id)"/>
+        <font-awesome-icon v-if="isAdded" class="remove-btn" icon="times" @click="$emit('toggle-song', playlist.id)"/>
         <font-awesome-icon v-else="isAdded" class="plus-btn" icon="plus" @click="$emit('toggle-song', playlist.id)"/>
     </div>
 </template>

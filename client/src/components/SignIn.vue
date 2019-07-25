@@ -4,8 +4,8 @@
         <form class="login-form" :class="loading">
             <div v-if="error" class="error">{{error}}</div>
             <input type="text" v-model="email" placeholder="Email"/>
-            <input type="password" v-model="password" placeholder="Password"/>
-            <Button @click.native="submit()">Submit</Button>
+            <input type="password" v-model="password" placeholder="Password" v-on:keyup.enter="submit"/>
+            <Button @click.native="submit">Submit</Button>
             <router-link to="/forgot-password" class="forgot-password" tag="span">Forgot password?</router-link>
         </form>
     </div>

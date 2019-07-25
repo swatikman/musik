@@ -4,12 +4,19 @@
             <h1>Search results for <strong>"{{query}}"</strong></h1>
             <div class="search-content">
                 <div class="search-options">
-                    <div class="search-option active">Everything</div>
-                    <div class="search-option">Songs</div>
-                    <div class="search-option">Playlists</div>
+                    <!--<div class="search-option active">Everything</div>-->
+                    <!--<div class="search-option">Songs</div>-->
+                    <!--<div class="search-option">Playlists</div>-->
+                    <div
+                        v-for="option in searchOptions"
+                        :key="option.text"
+                        class="search-option"
+                        :class="option.active ? 'active' : ''"
+                        @click="changeSearchOptions(option.value)"
+                    >{{option.text}}</div>
                 </div>
-                <div>
-                    <div v-for="item in searchResults" :key="item.id">
+                <div class="search-results">
+                    <div v-for="item in searchResults" :key="item.id" >
                         <div v-if="item.type === 'playlist'">
                             <MyPlaylist :playlist="item" />
                         </div>
@@ -29,16 +36,52 @@
     export default {
         name: "SearchPage",
         components: {MyPlaylist, Song},
+        created() {
+            if (this.$route.path === '/search' && this.$route.query) {
+                this.$store.dispatch('setSearchOption', {searchOption: this.$route.query.type});
+            }
+        },
         computed: {
             query() {
                 return this.$store.getters.getSearchQuery();
             },
             searchResults() {
                 return this.$store.getters.getSearchResults();
+            },
+            searchOption() {
+                return this.$store.getters.getSearchOption();
+            },
+            searchOptions() {
+                const type = this.searchOption;
+                return [{
+                    text: 'Everything',
+                    value: '',
+                    active: !type,
+                }, {
+                    text: 'Songs',
+                    value: 'song',
+                    active: type === 'song',
+                }, {
+                    text: 'Playlists',
+                    value: 'playlist',
+                    active: type === 'playlist',
+                }]
             }
         },
         watch: {
-            query(newValue) {
+            query() {
+                this.performSearch();
+            },
+            searchOption() {
+                this.$router.push({ path: '/search', query: {...this.$route.query, type: this.searchOption}});
+                this.performSearch();
+            }
+        },
+        methods: {
+            changeSearchOptions(searchOption) {
+                this.$store.dispatch('setSearchOption', {searchOption});
+            },
+            performSearch() {
                 this.$store.dispatch('fetchSearchAll')
             }
         }
@@ -55,6 +98,8 @@
             display: flex;
             flex-direction: row;
             justify-content: center;
+            background: #fcfcfc;
+            padding: 20px;
 
             .search-options {
                 display: flex;
@@ -72,6 +117,12 @@
                     }
                 }
             }
+        }
+
+        .search-results {
+            border-left: 1px solid rgba(0, 0, 0, .2);
+            padding: 0 20px;
+            min-width: 800px;
         }
     }
 </style>

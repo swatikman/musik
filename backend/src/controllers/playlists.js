@@ -16,22 +16,30 @@ module.exports.get = async (request, response) => {
         query = {sharedWithAll: 'true'};
     } else if (q) {
         query = {name: q}
+    } else {
+        query = {sharedWithAll: 'true'};
     }
     const snapshot = await getPlaylistsSnapshot(query);
+    
+    const sendBack = await populate(snapshot, ['songs', 'owner']);
 
-    const sendBack = await populate(snapshot, ['songs']);
     response.send(sendBack);
 };
 
 module.exports.getOne = async (request, response) => {
-    const playlist = await getPlaylist(request.params.id, request.uid);
-    const sendBack = await populate([playlist], ['songs']);
+    const {params: {id}, uid: userId} = request;
+
+    const playlist = await getAccessiblePlaylist(id, userId);
 
     if (playlist) {
-        response.send(sendBack[0]);
+        return response.send(playlist);
     } else {
-        response.status(404).send({error: 'Playlist not found'});
+        const playlists = await getAndPopulate({sharedLink: id});
+        if (playlists) {
+            return response.send(playlists[0]);
+        }
     }
+    response.status(404).send({error: 'Playlist not found'});
 };
 
 module.exports.create = async (request, response) => {
@@ -46,20 +54,19 @@ module.exports.create = async (request, response) => {
 
 module.exports.update = async (request, response) => {
     const {params: {id}, body, uid: userId} = request;
-    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
-    await playlist.ref.update({...body});
+    const snapshot = await getFirstItemSnapshot({playlistId: id, userId});
+    await snapshot.ref.update({...body});
 
-    const newPlaylist = await getFirstItemSnapshot({playlistId: id, userId});
-    const sendBack = await populate([newPlaylist], ['songs']);
-    response.send(sendBack[0]);
+    const newPlaylist = await getAndPopulate({playlistId: id, userId});
+    response.send(newPlaylist[0]);
 };
 
 module.exports.delete = async (request, response) => {
     const {params: {id}, uid: userId} = request;
-    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
+    const snapshot = await getFirstItemSnapshot({playlistId: id, userId});
 
-    if (playlist) {
-        playlist.ref.delete();
+    if (snapshot) {
+        snapshot.ref.delete();
         response.send({success: 'Playlist deleted'});
     } else {
         response.status(404).send({error: 'Playlist not found'});
@@ -68,10 +75,11 @@ module.exports.delete = async (request, response) => {
 
 module.exports.createSharedLink = async (request, response) => {
     const {params: {id}, uid: userId} = request;
-    const playlist = await getFirstItemSnapshot({playlistId: id, userId});
-    const sharedLink = `http://localhost:8080/playlist/${uuidv4()}`;
+    const snapshot = await getFirstItemSnapshot({playlistId: id, userId});
+    const sharedLinkId = uuidv4();
+    const sharedLink = `http://localhost:8080/#/playlist/${sharedLinkId}`;
 
-    await playlist.ref.update({sharedLink});
+    await snapshot.ref.update({sharedLink: sharedLinkId});
 
     response.send({sharedLink})
 };
@@ -80,9 +88,10 @@ module.exports.getSharedLink = async (request, response) => {
     const {params: {id}, uid: userId} = request;
     const playlist = await getFirstItemSnapshot({playlistId: id, userId});
     const sharedLink = playlist.data().sharedLink;
+    const sendBack = `http://localhost:8080/#/playlist/${sharedLink}`;
 
     if (sharedLink) {
-        response.send({sharedLink})
+        response.send({sharedLink: sendBack})
     } else {
         response.status(404).send({error: 'Link not found'})
     }
@@ -105,9 +114,17 @@ module.exports.toggleSong = async (request, response) => {
         await playlist.ref.update({songs: FieldValue.arrayRemove(song.ref)});
     }
 
-    const newPlaylist = await getFirstItemSnapshot({playlistId, userId});
-    const sendBack = await populate([newPlaylist], ['songs']);
-    response.send(sendBack[0])
+    const newPlaylist = await getAndPopulate({playlistId, userId});
+    response.send(newPlaylist[0])
+};
+
+
+const getAndPopulate = async (args) => {
+    const playlist = await getFirstItemSnapshot(args);
+    if (!playlist) {
+        return;
+    }
+    return populate([playlist], ['songs', 'owner']);
 };
 
 const getFirstItemSnapshot = async (args) => {
@@ -121,16 +138,17 @@ const getFirstItemSnapshot = async (args) => {
     return returnItem;
 };
 
-const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith, name}) => {
+const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith, name, sharedLink}) => {
     let query = playlists;
     if (playlistId) {
         query = query.where(documentId, '==', playlistId)
     }
     if (userId) {
-        query = query.where('owner', '==', userId);
+        const userRef = firestore().doc(`users/${userId}`);
+        query = query.where('owner', '==', userRef);
     }
     if (sharedWithAll) {
-        query = query.where('sharedWithAll', '==', true);
+        query = query.where('sharedWithAll', '==', sharedWithAll);
     }
     if (sharedWith) {
         query = query.where('sharedWith', '==', sharedWith);
@@ -138,17 +156,24 @@ const getPlaylistsSnapshot = ({playlistId, userId, sharedWithAll, sharedWith, na
     if (name) {
         query = query.where('name', '==', name);
     }
+    if (sharedLink) {
+        query = query.where('sharedLink', '==', sharedLink);
+    }
     return query.get();
 };
 
-const getPlaylist = async (playlistId, userId) => {
-    const playlist = await getFirstItemSnapshot({playlistId});
+const getAccessiblePlaylist = async (playlistId, userId) => {
+    const snapshot = await getFirstItemSnapshot({playlistId});
 
-    const data = playlist.data();
-    if (data.sharedWithAll
-        || data.owner === userId
-        || data.sharedWith.find(sharedUserId => sharedUserId === userId)) {
-        return playlist;
+    if (!snapshot) {
+        return;
+    }
+
+    const data = snapshot.data();
+    if (data.sharedWithAll === 'true'
+        || data.owner === userId) {
+        const playlist = await populate([snapshot], ['songs', 'owner']);
+        return playlist[0]
     }
 };
 
